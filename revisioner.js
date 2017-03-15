@@ -349,7 +349,7 @@ var Revisioner = (function () {
     var pathOriginal = this.Tool.get_relative_path(this.pathBase, file.revPathOriginal, true);
     var pathRevisioned = this.Tool.get_relative_path(file.base, file.path, true);
     // Add only specific file types to the manifest file
-    if (this.options.includeFilesInManifest.indexOf(ext) !== -1) {
+    if (this.options.includeFilesInManifest === '*' || this.options.includeFilesInManifest.indexOf(ext) !== -1) {
         this.manifest[pathOriginal] = pathRevisioned;
     }
 

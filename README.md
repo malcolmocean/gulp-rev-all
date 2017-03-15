@@ -1,4 +1,4 @@
-# [gulp](https://github.com/wearefractal/gulp)-rev-all [![Build Status](https://travis-ci.org/smysnk/gulp-rev-all.png?branch=master)](https://travis-ci.org/smysnk/gulp-rev-all)
+# [gulp](https://github.com/wearefractal/gulp)-rev-all
 
 > Static asset revisioning with dependency considerations, appends content hash to each filename (eg. unicorn.css => unicorn.098f6bcd.css), re-writes references.
 
@@ -13,7 +13,8 @@ Additionally, content distribution networks like [CloudFront](http://aws.amazon.
 ## Why fork... again?
 
 [smysnk](https://github.com/smysnk) forked this from [gulp-rev](https://github.com/sindresorhus/gulp-rev) to add reference processing and rewriting functionality.  
-It is the philosophy of `gulp-rev` that concerns should be seperated between revisioning the files and re-writing references to those files.  `gulp-rev-all` does not agree with this, we believe you need to analyze each revisioned files' references, to calculate a final hash for caching purposes.
+
+> It is the philosophy of `gulp-rev` that concerns should be seperated between revisioning the files and re-writing references to those files.  `gulp-rev-all` does not agree with this, we believe you need to analyze each revisioned files' references, to calculate a final hash for caching purposes.
 
 I forked it from him because I wanted to add support for stripping root paths.
 
@@ -21,11 +22,13 @@ I forked it from him because I wanted to add support for stripping root paths.
 
 You have a bunch of static assets (css, js, images) in `/public`, and a bunch of template files in `/views`. You want to modify the template files so they point to the revisioned static assets, but the public folder is the root of your server, so none of the absolute paths in your template files begin with `/public`, they're just `/img` or `/js` or whatever.
 
-By adding the option `stripRootPrefixes` (Array of RegExp), this fork converts an absolute path of `/public/img/icon.png` to `/img/icon.png` so it matches correctly.
+By adding the option `stripRootPrefixes: [/^\/?public/]` (Array of RegExp), this fork converts an absolute path of `/public/img/icon.png` to `/img/icon.png` so it matches correctly.
+
+Another tiny change: if you set `options.includeFilesInManifest: '*'`, then it'll include all files in the manifest regardless of extension.
 
 ## Install
 
-Add this line to your `package.json`, probably under `devDependencies` then run `npm install`:
+Add this line to your `package.json`, probably under `devDependencies`, then run `npm install`:
 
 ```
 "gulp-rev-all": "malcolmocean/gulp-rev-all"
