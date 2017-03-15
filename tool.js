@@ -133,7 +133,7 @@ module.exports = (function() {
    * the context to the reference file.
    *
    */
-  var get_reference_representations_absolute = function (fileCurrentReference, file) {
+  var get_reference_representations_absolute = function (fileCurrentReference, file, stripRootPrefixes) {
 
     var representations = [];
     var representation;
@@ -147,6 +147,15 @@ module.exports = (function() {
     representation = get_relative_path(fileCurrentReference.base, fileCurrentReference.revPathOriginal, true);
     if (representation.indexOf('/')) {
       representations.push(representation);
+    }
+
+    if (stripRootPrefixes && stripRootPrefixes.map) {
+      representations = representations.map(function (rep) {
+        stripRootPrefixes.map(function (regex) {
+          rep = rep.replace(regex, '')
+        })
+        return rep
+      })
     }
 
     return representations;

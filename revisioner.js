@@ -13,6 +13,7 @@ var Revisioner = (function () {
       'dontRenameFile': [],
       'dontUpdateReference': [],
       'dontSearchFile': [],
+      'stripRootPrefixes': [],
       'fileNameVersion': 'rev-version.json',
       'fileNameManifest': 'rev-manifest.json',
       'prefix': '',
@@ -234,7 +235,7 @@ var Revisioner = (function () {
         });
       }
 
-      references = this.Tool.get_reference_representations_absolute(fileCurrentReference, fileResolveReferencesIn);
+      references = this.Tool.get_reference_representations_absolute(fileCurrentReference, fileResolveReferencesIn, this.options.stripRootPrefixes);
       for (var i = 0, length = references.length; i < length; i++) {
         referenceGroupAbsolute.push({
           'file': this.files[path],
