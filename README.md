@@ -1,11 +1,10 @@
-# [gulp](https://github.com/wearefractal/gulp)-rev-all
+# gulp-rev-all [![NPM version](https://img.shields.io/npm/v/gulp-rev-all2.svg)](https://www.npmjs.com/package/gulp-rev-all2) [![Run tests](https://github.com/nfroidure/svg-pathdata/actions/workflows/test.yml/badge.svg)](https://github.com/nfroidure/svg-pathdata/actions/workflows/test.yml) [![Dependency Status](https://img.shields.io/david/smysnk/gulp-rev-all.svg)](https://david-dm.org/smysnk/gulp-rev-all)
 
 > Static asset revisioning with dependency considerations, appends content hash to each filename (eg. unicorn.css => unicorn.098f6bcd.css), re-writes references.
 
-
 ## Purpose
 
-By using the HTTP server response header ``expires`` combined with filename revisioning, static assets can be made cacheable for extended periods of time. Returning visitors will have the assets cached for super fast load times.
+By using the HTTP server response header `expires` combined with filename revisioning, static assets can be made cacheable for extended periods of time. Returning visitors will have the assets cached for super fast load times.
 
 Additionally, content distribution networks like [CloudFront](http://aws.amazon.com/cloudfront/) let you cache static assets in [Edge Locations](http://aws.amazon.com/about-aws/globalinfrastructure/) for extended periods of time.
 
@@ -18,95 +17,96 @@ Additionally, content distribution networks like [CloudFront](http://aws.amazon.
 
 I forked it from him because I wanted to add support for stripping root paths.
 
+Probably this should be a PR on the original or something? Hm.
+
 ### Consider the following example:
 
 You have a bunch of static assets (css, js, images) in `/public`, and a bunch of template files in `/views`. You want to modify the template files so they point to the revisioned static assets, but the public folder is the root of your server, so none of the absolute paths in your template files begin with `/public`, they're just `/img` or `/js` or whatever.
 
 By adding the option `stripRootPrefixes: [/^\/?public/]` (Array of RegExp), this fork converts an absolute path of `/public/img/icon.png` to `/img/icon.png` so it matches correctly.
 
-Another tiny change: if you set `options.includeFilesInManifest: '*'`, then it'll include all files in the manifest regardless of extension.
+Another tiny change: if you set `includeFilesInManifest: '*'`, then it'll include all files in the manifest regardless of extension.
 
 ## Install
 
 Add this line to your `package.json`, probably under `devDependencies`, then run `npm install`:
 
 ```
-"gulp-rev-all": "malcolmocean/gulp-rev-all"
+"gulp-rev-all2": "gulp-rev-all2"
+```
+
+Or [yarn](https://yarnpkg.com/):
+
+```
+yarn add --dev gulp-rev-all
 ```
 
 ## Usage
 
 ```js
-var gulp = require('gulp');
-var RevAll = require('gulp-rev-all');
+var gulp = require("gulp");
+var RevAll = require("gulp-rev-all2");
 
-gulp.task('default', function () {
-
-  gulp
-    .src('dist/**')
-    .pipe(RevAll.revision())
-    .pipe(gulp.dest('cdn'));
-
+gulp.task("default", function () {
+  gulp.src("dist/**").pipe(RevAll.revision()).pipe(gulp.dest("cdn"));
 });
 ```
 
-
 ```js
-var gulp = require('gulp');
-var RevAll = require('gulp-rev-all');
-var awspublish = require('gulp-awspublish');
+var gulp = require("gulp");
+var RevAll = require("gulp-rev-all2");
+var awspublish = require("gulp-awspublish");
 var cloudfront = require("gulp-cloudfront");
 
 var aws = {
-  "params": {
-  "Bucket": "bucket-name"
+  params: {
+    Bucket: "bucket-name",
   },
-  "accessKeyId": "AKIAI3Z7CUAFHG53DMJA",
-  "secretAccessKey": "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",
-  "distributionId": "E1SYAKGEMSK3OD",
-  "region": "us-standard",
+  accessKeyId: "AKIAI3Z7CUAFHG53DMJA",
+  secretAccessKey: "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",
+  distributionId: "E1SYAKGEMSK3OD",
+  region: "us-standard",
 };
 
 var publisher = awspublish.create(aws);
-var headers = {'Cache-Control': 'max-age=315360000, no-transform, public'};
+var headers = { "Cache-Control": "max-age=315360000, no-transform, public" };
 
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   gulp
-    .src('dist/**')
+    .src("dist/**")
     .pipe(RevAll.revision())
     .pipe(awspublish.gzip())
     .pipe(publisher.publish(headers))
     .pipe(publisher.cache())
     .pipe(awspublish.reporter())
     .pipe(cloudfront(aws));
-
 });
 ```
-  * See [gulp-awspublish](https://www.npmjs.org/package/gulp-awspublish), [gulp-cloudfront](https://www.npmjs.org/package/gulp-cloudfront)
+
+- See [gulp-awspublish](https://www.npmjs.org/package/gulp-awspublish), [gulp-cloudfront](https://www.npmjs.org/package/gulp-cloudfront)
 
 ## Methods
 
 ### .revision({ options })
+
 Returns a transform function that can be used to pipe files through so that they may be revisioned, also corrects refererences to said files.
 
 ### .manifestFile()
-Returns a transform function that will filter out any existing files going through the pipe and will emit a new manifest file.  Must be called after `.revision()`.
+
+Returns a transform function that will filter out any existing files going through the pipe and will emit a new manifest file. Must be called after `.revision()`.
 
 ```js
-var gulp = require('gulp');
-var RevAll = require('gulp-rev-all');
+var gulp = require("gulp");
+var RevAll = require("gulp-rev-all2");
 
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   return gulp
-    .src(['assets/**'])
-    .pipe(gulp.dest('build/assets'))  
+    .src(["assets/**"])
+    .pipe(gulp.dest("build/assets"))
     .pipe(RevAll.revision())
-    .pipe(gulp.dest('build/assets'))  
+    .pipe(gulp.dest("build/assets"))
     .pipe(RevAll.manifestFile())
-    .pipe(gulp.dest('build/assets')); 
-
+    .pipe(gulp.dest("build/assets"));
 });
 ```
 
@@ -120,22 +120,21 @@ An asset manifest, mapping the original paths to the revisioned paths, will be w
 ```
 
 ### .versionFile()
-Returns a transform function that will filter out any existing files going through the pipe and will emit a new version file.  Must be called after `.revision()`.
+
+Returns a transform function that will filter out any existing files going through the pipe and will emit a new version file. Must be called after `.revision()`.
 
 ```js
-var gulp = require('gulp');
-var RevAll = require('gulp-rev-all');
+var gulp = require("gulp");
+var RevAll = require("gulp-rev-all2");
 
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   return gulp
-    .src(['assets/**'])
-    .pipe(gulp.dest('build/assets'))
+    .src(["assets/**"])
+    .pipe(gulp.dest("build/assets"))
     .pipe(RevAll.revision())
-    .pipe(gulp.dest('build/assets'))
+    .pipe(gulp.dest("build/assets"))
     .pipe(RevAll.versionFile())
-    .pipe(gulp.dest('build/assets'));
-
+    .pipe(gulp.dest("build/assets"));
 });
 ```
 
@@ -148,27 +147,31 @@ The version file will contain the build date and a combined hash of all the revi
 }
 ```
 
-
 ## Options
+
 ```js
-gulp.src('dist/**')
-  .pipe(RevAll.revision({ options }))
+gulp.src("dist/**").pipe(RevAll.revision({ options }));
 ```
 
 #### fileNameVersion
+
 Type: `String`<br/>
 Default: `rev-version.json`<br />
 Set the filename of the file created by revAll.versionFile()<br/>
 
 #### fileNameManifest
+
 Set the filename of the file created by revAll.manifestFile()<br/>
 Type: `String`<br/>
 Default: `rev-manifest.json`
 
 #### includeFilesInManifest
+
 Add only specific file types to the manifest file<br/>
 Type: `Array of strings`<br/>
 Default: `['.css', '.js']`
+
+If you set it to just the string `'*'` it will include all files.
 
 #### dontGlobal
 
@@ -177,16 +180,19 @@ Type: `Array of (Regex and/or String)`<br/>
 Default: `[ /^\/favicon.ico$/ ]`<br/>
 
 #### dontRenameFile
+
 Don't rename files matching these rules<br/>
 Type: `Array of (Regex and/or String)`<br/>
 Default: `[]`
 
 #### dontUpdateReference
+
 Don't update references matching these rules<br/>
 Type: `Array of (Regex and/or String)`<br/>
 Default: `[]`
 
 #### dontSearchFile
+
 Don't search for references in files matching these rules<br/>
 Type: `Array of (Regex and/or String)`<br/>
 Default: `[]`
@@ -194,13 +200,11 @@ Default: `[]`
 In some cases, you may not want to rev your `*.html` files:
 
 ```js
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   gulp
-    .src('dist/**')
-    .pipe(RevAll.revision({ dontRenameFile: [/^\/favicon.ico$/g, '.html'] }))
-    .pipe(gulp.dest('cdn'))
-
+    .src("dist/**")
+    .pipe(RevAll.revision({ dontRenameFile: [/^\/favicon.ico$/g, ".html"] }))
+    .pipe(gulp.dest("cdn"));
 });
 ```
 
@@ -218,97 +222,99 @@ gulp.task('default', function () {
 ```
 
 #### hashLength
+
 Change the length of the hash appended to the end of each revisioned file (use `transformFilename` for more complicated scenarios).<br/>
 Type: `hashLength`<br/>
 Default: `8`<br/>
 
 ```js
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   gulp
-    .src('dist/**')
+    .src("dist/**")
     .pipe(RevAll.revision({ hashLength: 4 }))
-    .pipe(gulp.dest('cdn'))
-
+    .pipe(gulp.dest("cdn"));
 });
 ```
 
 #### prefix
+
 Prefixes absolute references with a string (use `transformPath` for more complicated scenarios). Useful for adding a full url path to files.<br/>
 Type: `prefix`<br/>
 Default: `none`<br/>
 
 ```js
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   gulp
-    .src('dist/**')
-    .pipe(RevAll.revision({ prefix: 'http://1234.cloudfront.net/' }))
-    .pipe(gulp.dest('cdn'))
-
+    .src("dist/**")
+    .pipe(RevAll.revision({ prefix: "http://1234.cloudfront.net/" }))
+    .pipe(gulp.dest("cdn"));
 });
 ```
 
 #### transformPath
+
 Specify a function to transform the reference path. Useful in instances where the local file structure does not reflect what the remote file structure will be.<br/>
 Type: `function (rev, source, path)`<br/>
 Default: `none`<br/>
 
 The function takes three arguments:
-  - `rev` - revisioned reference path
-  - `source` - original reference path
-  - `path` - path to the file
 
+- `rev` - revisioned reference path
+- `source` - original reference path
+- `path` - path to the file
 
 ```js
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   gulp
-    .src('dist/**')
-    .pipe(RevAll.revision({
-      transformPath: function (rev, source, path) {
-      // on the remote server, image files are served from `/images`
-      return rev.replace('/img', '/images');
-      }
-    }))
-    .pipe(gulp.dest('cdn'))
-
+    .src("dist/**")
+    .pipe(
+      RevAll.revision({
+        transformPath: function (rev, source, path) {
+          // on the remote server, image files are served from `/images`
+          return rev.replace("/img", "/images");
+        },
+      })
+    )
+    .pipe(gulp.dest("cdn"));
 });
 ```
 
 #### transformFilename
+
 If the default naming convention does not suite your needs, you can specify a custom filename transform. <br/>
 Type: `function (file, hash)`<br/>
 Default: `none`<br/>
 
 The function takes one argument:
-  - `file` - file to be revisioned
-  - `hash` - calculated hash of the file
+
+- `file` - file to be revisioned
+- `hash` - calculated hash of the file
 
 ```js
-gulp.task('default', function () {
-
+gulp.task("default", function () {
   gulp
-    .src('dist/**')
-    .pipe(RevAll.revision({
-      transformFilename: function (file, hash) {
-        var ext = path.extname(file.path);
-        return hash.substr(0, 5) + '.'  + path.basename(file.path, ext) + ext; // 3410c.filename.ext
-      }
-    }))
-    .pipe(gulp.dest('cdn'))
-    
+    .src("dist/**")
+    .pipe(
+      RevAll.revision({
+        transformFilename: function (file, hash) {
+          var ext = path.extname(file.path);
+          return hash.substr(0, 5) + "." + path.basename(file.path, ext) + ext; // 3410c.filename.ext
+        },
+      })
+    )
+    .pipe(gulp.dest("cdn"));
 });
 ```
 
 #### debug
+
 If you set this options to true, verbose logging will be emitted to console.<br/>
 Type: `Boolean`<br/>
 Default: `false`<br/>
 
 ## Annotater & Replacer
 
-In some cases, false-positives may occur.  Strings that are similar to a file reference may be incorrectly replaced.<br/>
+In some cases, false-positives may occur. Strings that are similar to a file reference may be incorrectly replaced.<br/>
 
 In the example below, the 2nd instance of 'xyz' is not reference to the file xyz.js:
 
@@ -330,7 +336,7 @@ angular.controller('myController', ['xyz.123', function(xyz) {
 }]);
 ```
 
-This behaviour can be avoided by passing custom ```annotator``` and ```replacer``` functions in as options.
+This behaviour can be avoided by passing custom `annotator` and `replacer` functions in as options.
 
 ### Annotator
 
@@ -342,8 +348,8 @@ The file will be reassembled in order. <br/>
 The default annotator returns one fragment with no annotations:
 
 ```js
-options.annotator = function(contents, path) {
-  var fragments = [{'contents': contents}];
+options.annotator = function (contents, path) {
+  var fragments = [{ contents: contents }];
   return fragments;
 };
 ```
@@ -352,16 +358,24 @@ options.annotator = function(contents, path) {
 
 The replacer function's job is to replace references to revisioned files. The paremeters are as follows:<br/>
 
-```fragment```: a file fragment as created in the annotator function.<br/>
-```replaceRegExp```: parameter is a regular expression that can be used to match the part of the fragement to be replaced. The regular expression has 4 capture groups. $1 & $4 are what precedes and follows the reference. $2 is the file path without the extension, and $3 is the file extension.<br/>
-```newReference```: what gulp-rev-all wants to replace the file path without the extension ($2) with.<br/>
-```referencedFile```: contains additional properties of the file reference thats being replaced. See the 'Additional Properties' section for more information.<br/>
+`fragment`: a file fragment as created in the annotator function.<br/>
+`replaceRegExp`: parameter is a regular expression that can be used to match the part of the fragement to be replaced. The regular expression has 4 capture groups. $1 & $4 are what precedes and follows the reference. $2 is the file path without the extension, and $3 is the file extension.<br/>
+`newReference`: what gulp-rev-all wants to replace the file path without the extension (\$2) with.<br/>
+`referencedFile`: contains additional properties of the file reference thats being replaced. See the 'Additional Properties' section for more information.<br/>
 
 The default replacer function is as follows:
 
 ```js
-options.replacer = function(fragment, replaceRegExp, newReference, referencedFile) {
-   fragment.contents = fragment.contents.replace(replaceRegExp, '$1' + newReference + '$3$4');
+options.replacer = function (
+  fragment,
+  replaceRegExp,
+  newReference,
+  referencedFile
+) {
+  fragment.contents = fragment.contents.replace(
+    replaceRegExp,
+    "$1" + newReference + "$3$4"
+  );
 };
 ```
 
@@ -369,26 +383,29 @@ You can overide the default annotator and replacer to change the behaviour of gu
 
 ## Additional Properties
 
-### file.revPathOriginal 
+### file.revPathOriginal
+
 The original full path of the file, before revisioning.
 
 ### file.revFilenameOriginal
+
 The original filename less the file extension, before revisioning.
 
 ### file.revFilenameExtOriginal
+
 The original file extension, before revisioning.
 
 ### file.revHashOriginal
+
 The original hash of the asset before any calculations by `gulp-rev-all`.
 
 ### file.revHash
-The hash of the asset as calculated by `gulp-rev-all`, you can use this for customizing the file renaming, or for building different manifest formats.
 
+The hash of the asset as calculated by `gulp-rev-all`, you can use this for customizing the file renaming, or for building different manifest formats.
 
 ## Tips
 
 Make sure to set the files to [never expire](http://developer.yahoo.com/performance/rules.html#expires) for this to have an effect.
-
 
 ## License
 

@@ -1,5 +1,5 @@
-'use strict';
+"use strict";
 
-exports.hello = function() {
-  return 'Hello World'
+exports.hello = function () {
+  return "Hello World";
 };

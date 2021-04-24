@@ -1,17 +1,17 @@
 requirejs.config({
-    baseUrl: "./",
-    paths: {
-        react: "lib/react",
-        jquery: "lib/jquery"
+  baseUrl: "./",
+  paths: {
+    react: "lib/react",
+    jquery: "lib/jquery",
+  },
+  shim: {
+    jquery: {
+      exports: "$",
     },
-    "shim": {
-        "jquery" : {
-            "exports": "$"
-        }
+  },
+  map: {
+    "*": {
+      css: "lib/css",
     },
-    map: {
-        "*": {
-            css: "lib/css"
-        }
-    }
+  },
 });
