@@ -1,4 +1,4 @@
-# gulp-rev-all [![NPM version](https://img.shields.io/npm/v/gulp-rev-all.svg)](https://www.npmjs.com/package/gulp-rev-all) [![Run tests](https://github.com/nfroidure/svg-pathdata/actions/workflows/test.yml/badge.svg)](https://github.com/nfroidure/svg-pathdata/actions/workflows/test.yml) [![Dependency Status](https://img.shields.io/david/smysnk/gulp-rev-all.svg)](https://david-dm.org/smysnk/gulp-rev-all)
+# gulp-rev-all [![NPM version](https://img.shields.io/npm/v/gulp-rev-all2.svg)](https://www.npmjs.com/package/gulp-rev-all2) [![Run tests](https://github.com/nfroidure/svg-pathdata/actions/workflows/test.yml/badge.svg)](https://github.com/nfroidure/svg-pathdata/actions/workflows/test.yml) [![Dependency Status](https://img.shields.io/david/smysnk/gulp-rev-all.svg)](https://david-dm.org/smysnk/gulp-rev-all)
 
 > Static asset revisioning with dependency considerations, appends content hash to each filename (eg. unicorn.css => unicorn.098f6bcd.css), re-writes references.
 
@@ -8,24 +8,31 @@ By using the HTTP server response header `expires` combined with filename revisi
 
 Additionally, content distribution networks like [CloudFront](http://aws.amazon.com/cloudfront/) let you cache static assets in [Edge Locations](http://aws.amazon.com/about-aws/globalinfrastructure/) for extended periods of time.
 
-## Why fork?
 
-This project was forked from [gulp-rev](https://github.com/sindresorhus/gulp-rev) to add reference processing and rewriting functionality.
-It is the philosophy of `gulp-rev` that concerns should be seperated between revisioning the files and re-writing references to those files. `gulp-rev-all` does not agree with this, we believe you need to analyze each revisioned files' references, to calculate a final hash for caching purposes.
+## Why fork... again?
+
+[smysnk](https://github.com/smysnk) forked this from [gulp-rev](https://github.com/sindresorhus/gulp-rev) to add reference processing and rewriting functionality.  
+
+> It is the philosophy of `gulp-rev` that concerns should be seperated between revisioning the files and re-writing references to those files.  `gulp-rev-all` does not agree with this, we believe you need to analyze each revisioned files' references, to calculate a final hash for caching purposes.
+
+I forked it from him because I wanted to add support for stripping root paths.
+
+Probably this should be a PR on the original or something? Hm.
 
 ### Consider the following example:
 
-A css file makes reference to an image. If the image changes, the hash of the css file remains the same since its contents have not changed. Web clients that have previously cached this css file will not correctly resolve the new image.
-If we take in to consideration the dependency graph while calculating the css file hash, we can have it change if any of its child references have changed.
+You have a bunch of static assets (css, js, images) in `/public`, and a bunch of template files in `/views`. You want to modify the template files so they point to the revisioned static assets, but the public folder is the root of your server, so none of the absolute paths in your template files begin with `/public`, they're just `/img` or `/js` or whatever.
 
-So to recap, `gulp-rev-all` not only handles reference re-writing but it also takes child references into consideration when calculating a hashes.
+By adding the option `stripRootPrefixes` (Array of RegExp), this fork converts an absolute path of `/public/img/icon.png` to `/img/icon.png` so it matches correctly.
+
+Another tiny change: if you set `includeFilesInManifest: '*'`, then it'll include all files in the manifest regardless of extension.
 
 ## Install
 
-Install with [npm](https://npmjs.org/)
+Add this line to your `package.json`, probably under `devDependencies` then run `npm install`:
 
 ```
-npm install --save-dev gulp-rev-all
+"gulp-rev-all2": "gulp-rev-all2"
 ```
 
 Or [yarn](https://yarnpkg.com/):
@@ -38,7 +45,7 @@ yarn add --dev gulp-rev-all
 
 ```js
 var gulp = require("gulp");
-var RevAll = require("gulp-rev-all");
+var RevAll = require("gulp-rev-all2");
 
 gulp.task("default", function () {
   gulp.src("dist/**").pipe(RevAll.revision()).pipe(gulp.dest("cdn"));
@@ -47,7 +54,7 @@ gulp.task("default", function () {
 
 ```js
 var gulp = require("gulp");
-var RevAll = require("gulp-rev-all");
+var RevAll = require("gulp-rev-all2");
 var awspublish = require("gulp-awspublish");
 var cloudfront = require("gulp-cloudfront");
 
@@ -90,7 +97,7 @@ Returns a transform function that will filter out any existing files going throu
 
 ```js
 var gulp = require("gulp");
-var RevAll = require("gulp-rev-all");
+var RevAll = require("gulp-rev-all2");
 
 gulp.task("default", function () {
   return gulp
@@ -118,7 +125,7 @@ Returns a transform function that will filter out any existing files going throu
 
 ```js
 var gulp = require("gulp");
-var RevAll = require("gulp-rev-all");
+var RevAll = require("gulp-rev-all2");
 
 gulp.task("default", function () {
   return gulp
@@ -163,6 +170,8 @@ Default: `rev-manifest.json`
 Add only specific file types to the manifest file<br/>
 Type: `Array of strings`<br/>
 Default: `['.css', '.js']`
+
+If you set it to just the string `'*'` it will include all files.
 
 #### dontGlobal
 

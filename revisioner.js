@@ -14,6 +14,7 @@ var Revisioner = (function () {
       dontRenameFile: [],
       dontUpdateReference: [],
       dontSearchFile: [],
+      stripRootPrefixes: [],
       fileNameVersion: "rev-version.json",
       fileNameManifest: "rev-manifest.json",
       prefix: "",
@@ -250,11 +251,16 @@ var Revisioner = (function () {
         });
       }
 
+<<<<<<< HEAD
       references = this.Tool.get_reference_representations_absolute(
         fileCurrentReference,
         fileResolveReferencesIn
       );
       for (i = 0, length = references.length; i < length; i++) {
+=======
+      references = this.Tool.get_reference_representations_absolute(fileCurrentReference, fileResolveReferencesIn, this.options.stripRootPrefixes);
+      for (var i = 0, length = references.length; i < length; i++) {
+>>>>>>> 4a6c3b7... fork from smysnk & add stripRootPrefixes option
         referenceGroupAbsolute.push({
           file: this.files[path],
           path: references[i],
@@ -402,7 +408,7 @@ var Revisioner = (function () {
       true
     );
     // Add only specific file types to the manifest file
-    if (this.options.includeFilesInManifest.indexOf(ext) !== -1) {
+    if (this.options.includeFilesInManifest === '*' || this.options.includeFilesInManifest.indexOf(ext) !== -1) {
       this.manifest[pathOriginal] = pathRevisioned;
     }
 
